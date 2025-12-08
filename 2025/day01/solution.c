@@ -1,15 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 #define TURNS_ARRAY_BUF_SIZE 8192
 
 typedef struct {
     int items[TURNS_ARRAY_BUF_SIZE];
     int size;
-} TurnsArray;
+} TurnArray;
 
-TurnsArray turns_array_from_file(char *file_path) {
-    TurnsArray arr = {0};
+TurnArray turn_array_from_file(char *file_path) {
+    TurnArray arr = {0};
 
     FILE *fp = fopen(file_path, "r");
     if (fp == NULL) {
@@ -35,14 +36,14 @@ int modulo(int a, int b) {
 }
 
 int part1(char *file_path) {
-    TurnsArray turns = turns_array_from_file(file_path);
+    TurnArray turn = turn_array_from_file(file_path);
     
     int count = 0;
     int dial_value = 50;
     const int dial_size = 100;
     
-    for (int i = 0; i < turns.size; ++i) {
-        dial_value = modulo(dial_value + turns.items[i], dial_size);
+    for (int i = 0; i < turn.size; ++i) {
+        dial_value = modulo(dial_value + turn.items[i], dial_size);
         if (dial_value == 0) {
             count++;
         }
@@ -51,19 +52,19 @@ int part1(char *file_path) {
 }
 
 int part2(char *file_path) {
-    TurnsArray turns = turns_array_from_file(file_path);
+    TurnArray turn = turn_array_from_file(file_path);
 
     int count = 0;
     int dial_value = 50;
     const int dial_size = 100;
     
-    for (int i = 0; i < turns.size; ++i) {
-        dial_value += turns.items[i];
+    for (int i = 0; i < turn.size; ++i) {
+        dial_value += turn.items[i];
 
         if (dial_value > 0) {
             count += dial_value / dial_size;
         } else {
-            if (dial_value != turns.items[i]) count += 1;
+            if (dial_value != turn.items[i]) count += 1;
             count -= dial_value / dial_size;
         }
         dial_value = modulo(dial_value, dial_size);
@@ -72,8 +73,11 @@ int part2(char *file_path) {
 }
 
 int main() {
-    printf("Door password: %d\n", part1("input.txt"));
-    printf("Method 0x434C49434B: %d\n", part2("input.txt"));
+    assert(part1("day01/test.txt") == 3);
+    assert(part2("day01/test.txt") == 6);
+
+    printf("Door password: %d\n", part1("day01/input.txt"));
+    printf("Method 0x434C49434B: %d\n", part2("day01/input.txt"));
 
     return 0;
 }
