@@ -12,10 +12,7 @@ typedef struct {
 } IdRange;
 
 int id_range_merge(IdRange *range, IdRange *other) {
-    if (range->beg > other->end){
-        return 0;
-    }
-    if (range->end < other->beg) {
+    if (range->beg > other->end || range->end < other->beg){
         return 0;
     }
     if (range->beg > other->beg) {
@@ -106,17 +103,17 @@ size_t inventory_count_items_in_ranges(Inventory *inventory) {
     return count;
 }
 
-void inventory_consolidate_ranges(Inventory *inventory) {
+void inventory_merge_ranges(Inventory *inventory) {
     IdRange curr_range;
 
     size_t found;
     IdRange new_ranges[RANGES_CAPACITY] = {{0}};
     size_t new_ranges_size;
 
-    size_t consolidating = 1;
+    size_t merging = 1;
 
-    while (consolidating) {
-        consolidating = 0;
+    while (merging) {
+        merging = 0;
 
         new_ranges[0] = inventory->ranges[0];
         new_ranges_size = 1;
@@ -129,7 +126,7 @@ void inventory_consolidate_ranges(Inventory *inventory) {
                 if (!id_range_merge(&new_ranges[j], &curr_range)) {
                     continue;
                 }
-                consolidating = 1;
+                merging = 1;
                 found = 1;
                 break;
             }
@@ -161,7 +158,7 @@ size_t part1(char *file_path) {
 
 size_t part2(char *file_path) {
     Inventory inventory = inventory_from_file(file_path);
-    inventory_consolidate_ranges(&inventory);
+    inventory_merge_ranges(&inventory);
     return inventory_count_valid_ids(&inventory);
 }
 
