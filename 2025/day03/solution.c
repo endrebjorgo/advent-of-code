@@ -12,7 +12,7 @@ typedef struct {
 } BatteryBank;
 
 BatteryBank bb_from_string(char *string) {
-    BatteryBank bb = {0};
+    BatteryBank bb = { .batteries = {0}, .size = 0 };
     size_t size = 0;
     while (1) {
         if (string[size] == '\n') break;
@@ -21,14 +21,6 @@ BatteryBank bb_from_string(char *string) {
     }
     bb.size = size;
     return bb;
-}
-
-size_t power_of_10(size_t e) {
-    size_t result = 1;
-    for (size_t i = 0; i < e; ++i) {
-        result *= 10;
-    }
-    return result;
 }
 
 size_t bb_max_joltage(BatteryBank *bb, size_t on_count) {
@@ -41,7 +33,7 @@ size_t bb_max_joltage(BatteryBank *bb, size_t on_count) {
                 max_index = j;
             }
         }
-        max_joltage += power_of_10(on_count - i - 1) * bb->batteries[max_index];
+        max_joltage = max_joltage * 10 + bb->batteries[max_index];
         max_index++;
     }
     return max_joltage;
@@ -65,7 +57,11 @@ BatteryBankArray bba_from_file(char *file_path) {
         exit(1);
     }
 
-    BatteryBankArray bba = {0};
+    BatteryBankArray bba = {
+        .items = { { .batteries = {0}, .size = 0 } },
+        .size = 0
+    };
+
 
     char line[BATTERY_BANK_CAPACITY];
     while (fgets(line, BATTERY_BANK_CAPACITY, fp) != NULL) {
